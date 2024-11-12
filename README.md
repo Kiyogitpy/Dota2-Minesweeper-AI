@@ -32,7 +32,7 @@ It will help you beat the game.
 
 3. Clicked on a mine or freezing when a level is not finished
 
-    If the program runs normally most of the time, it’s likely that a cell number was not accurately recognized. Maybe try again.
+    If the program runs normally most of the time, it's likely that a cell number was not accurately recognized. Consider press `t` to turn off turbo mode, or just try a few more times.
 
 
 4. Cleared all level, but the score wasn't enough.

@@ -24,6 +24,7 @@ start_agent = False
 stop_agent = False
 pause_agent = False
 make_flag = False
+fast_agent = True
 
 level_info = {
     1: ((9, 9), 10),
@@ -59,6 +60,7 @@ def on_press(key):
     global stop_agent
     global pause_agent
     global make_flag
+    global fast_agent
 
     try:
         if key.char == 'b':
@@ -69,6 +71,9 @@ def on_press(key):
         elif key.char == 'f':
             make_flag = not make_flag
             print('set flag to', make_flag)
+        elif key.char == 't':
+            fast_agent = not fast_agent
+            print('set turbo mode to', fast_agent)
 
     except AttributeError:
         if key == Key.esc:
@@ -512,7 +517,11 @@ class MineSweeperAgent:
             pyautogui.moveTo(x, y)
             pyautogui.click(interval=0.2)
             pyautogui.moveTo(self._bottom_right[0] + 5, self._bottom_right[1] + 5)
-            time.sleep(4)
+
+            if not fast_agent:
+                time.sleep(4)
+            else:
+                time.sleep(2)
 
         pyautogui.moveTo(self._bottom_right[0] + 5, self._bottom_right[1] + 5)
 
@@ -930,22 +939,27 @@ def run():
                 continue
 
             t1 = time.time()
-            # double check
-            board1 = None
-            board2 = None
-            while board1 is None or not np.array_equal(board1, board2):
-                t2 = time.time()
-                board_array = agent.identify_game_board()
-                grids = agent.split_board_into_grids(board_array)
-                agent.update_elements(grids)
-                board1 = agent.board
-                cost = time.time() - t2
-                time.sleep(max(1.0 - cost, 0))
+            if not fast_agent:
+                # double check
+                board1 = None
+                board2 = None
+                while board1 is None or not np.array_equal(board1, board2):
+                    t = time.time()
+                    board_array = agent.identify_game_board()
+                    grids = agent.split_board_into_grids(board_array)
+                    agent.update_elements(grids)
+                    board1 = agent.board
+                    cost = time.time() - t1
+                    time.sleep(max(1.0 - cost, 0))
 
+                    board_array = agent.identify_game_board()
+                    grids = agent.split_board_into_grids(board_array)
+                    agent.update_elements(grids)
+                    board2 = agent.board
+            else:
                 board_array = agent.identify_game_board()
                 grids = agent.split_board_into_grids(board_array)
                 agent.update_elements(grids)
-                board2 = agent.board
 
             print(agent.board)
             print()
@@ -995,6 +1009,7 @@ if __name__ == "__main__":
     print("'f': Toggle auto-flagging of mines (default off)")
     print("'p': Pause/Resume the program")
     print("'esc': Exit the program")
+    print("'t': Toggle turbo mode，Trade off between speed and accuracy. (default on)")
 
     listener = Listener(on_press=on_press)
     listener.start()
