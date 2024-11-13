@@ -24,7 +24,7 @@ start_agent = False
 stop_agent = False
 pause_agent = False
 make_flag = False
-fast_agent = True
+fast_agent = False
 
 level_info = {
     1: ((9, 9), 10),
@@ -744,12 +744,15 @@ class Solver:
             total_prob = np.zeros(prob.shape)  # The summed weighted probabilities.
             for c_ms in product(*[d.keys() for d in c_probs]):
                 m = sum(c_ms)
-                if self.mines_left() - n <= m <= mines_left:
+                # if self.mines_left() - n <= m <= mines_left:
+                try:
                     comb_prob = reduce(np.add, [c_probs[c][c_m] for c, c_m in enumerate(c_ms)])
                     comb_model_count = reduce(mul, [c_counts[c][c_m] for c, c_m in enumerate(c_ms)])
                     weight = weights[m] * comb_model_count
                     total_weight += weight
                     total_prob += weight * comb_prob
+                except Exception as e:
+                    continue
             total_prob /= total_weight
             prob[solution_mask] = total_prob[solution_mask]
         if n > 0:
@@ -1009,7 +1012,7 @@ if __name__ == "__main__":
     print("'f': Toggle auto-flagging of mines (default off)")
     print("'p': Pause/Resume the program")
     print("'esc': Exit the program")
-    print("'t': Toggle turbo mode，Trade off between speed and accuracy. (default on)")
+    print("'t': Toggle turbo mode，Trade off between speed and accuracy. Turn on for higher score and off for program stability (default off)")
 
     listener = Listener(on_press=on_press)
     listener.start()
